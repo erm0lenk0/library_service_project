@@ -6,6 +6,7 @@ from .serializers import UserSerializer, UserCreateSerializer, UserDetailSeriali
 
 User = get_user_model()
 
+
 @extend_schema_view(
     list=extend_schema(
         summary="List all users",

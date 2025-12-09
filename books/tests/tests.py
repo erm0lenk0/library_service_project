@@ -10,7 +10,10 @@ User = get_user_model()
 class BookAPITestCase(APITestCase):
     def setUp(self):
         self.user = User.objects.create(
-            email="admin@example.com", password="password", is_staff=True, is_superuser=True
+            email="admin@example.com",
+            password="password",
+            is_staff=True,
+            is_superuser=True,
         )
         self.client.force_authenticate(user=self.user)
 

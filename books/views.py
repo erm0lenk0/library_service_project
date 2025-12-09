@@ -46,7 +46,7 @@ from .permissions import IsAdminOrReadOnly
         description="Deletes a book. Only available to administrators.",
         responses={204: None},
         tags=["Books"],
-    )
+    ),
 )
 class BookViewSet(viewsets.ModelViewSet):
     queryset = Book.objects.all()
