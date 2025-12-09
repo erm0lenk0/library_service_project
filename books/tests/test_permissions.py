@@ -1,18 +1,25 @@
 from rest_framework.test import APIClient, APITestCase
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from books.models import Book
+
+User = get_user_model()
+
 
 class BookPermissionTestCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(
-            username="user", password="password", is_staff=False
+            email="user@example.com", password="password", is_staff=False
         )
         self.admin = User.objects.create_user(
-            username="admin", password="password", is_staff=True
+            email="admin@example.com", password="password", is_staff=True
         )
         self.book = Book.objects.create(
-            title="Test Book", author="Author", cover="SOFT", inventory=5, daily_fee=1.50
+            title="Test Book",
+            author="Author",
+            cover="SOFT",
+            inventory=5,
+            daily_fee=1.50,
         )
 
     def test_list_books_requires_authentication(self):
@@ -25,24 +32,30 @@ class BookPermissionTestCase(APITestCase):
 
     def test_user_cannot_create_book(self):
         self.client.force_authenticate(user=self.user)
-        response = self.client.post("/api/books/", {
-            "title": "New Book",
-            "author": "Author",
-            "cover": "SOFT",
-            "inventory": 3,
-            "daily_fee": 1.50
-        })
+        response = self.client.post(
+            "/api/books/",
+            {
+                "title": "New Book",
+                "author": "Author",
+                "cover": "SOFT",
+                "inventory": 3,
+                "daily_fee": 1.50,
+            },
+        )
         self.assertEqual(response.status_code, 403)
 
     def test_admin_can_create_book(self):
         self.client.force_authenticate(user=self.admin)
-        response = self.client.post("/api/books/", {
-            "title": "Admin Book",
-            "author": "Admin Author",
-            "cover": "HARD",
-            "inventory": 10,
-            "daily_fee": 2.00
-        })
+        response = self.client.post(
+            "/api/books/",
+            {
+                "title": "Admin Book",
+                "author": "Admin Author",
+                "cover": "HARD",
+                "inventory": 10,
+                "daily_fee": 2.00,
+            },
+        )
         self.assertEqual(response.status_code, 201)
 
     def test_user_cannot_delete_book(self):

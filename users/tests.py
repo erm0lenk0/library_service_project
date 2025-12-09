@@ -64,4 +64,3 @@ class UserAPITestCase(APITestCase):
         url = reverse("users-detail", args=[self.admin.id])
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-

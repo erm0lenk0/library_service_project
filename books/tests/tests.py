@@ -1,15 +1,16 @@
 from django.urls import reverse
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.test import APITestCase
 from books.models import Book
 
+User = get_user_model()
 
 
 class BookAPITestCase(APITestCase):
     def setUp(self):
         self.user = User.objects.create(
-            username="admin", password="password", is_staff=True, is_superuser=True
+            email="admin@example.com", password="password", is_staff=True, is_superuser=True
         )
         self.client.force_authenticate(user=self.user)
 
