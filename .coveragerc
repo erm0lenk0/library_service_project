@@ -3,6 +3,7 @@ branch = True
 source =
     books
     library_service_project
+    users
 
 [report]
 show_missing = True
