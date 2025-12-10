@@ -4,6 +4,7 @@ source =
     books
     library_service_project
     users
+    borrowings
 
 [report]
 show_missing = True
