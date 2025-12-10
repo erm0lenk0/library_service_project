@@ -36,6 +36,8 @@ class BorrowingCreateSerializer(serializers.ModelSerializer):
 
         if expected_return_date <= borrow_date:
             raise serializers.ValidationError(
-                {"expected_return_date": "The return date must be later than the issue date."}
+                {
+                    "expected_return_date": "The return date must be later than the issue date."
+                }
             )
         return data

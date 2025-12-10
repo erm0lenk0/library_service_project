@@ -24,13 +24,12 @@ from .serializers import BorrowingSerializer, BorrowingCreateSerializer
         responses={201: BorrowingCreateSerializer},
         tags=["Borrowings"],
     ),
-
 )
 class BorrowingViewSet(viewsets.ModelViewSet):
     queryset = Borrowing.objects.all()
-    serializer_class = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
-    def get_serializer_context(self):
+    def get_serializer_class(self):
         if self.action == "create":
             return BorrowingCreateSerializer
         return BorrowingSerializer
