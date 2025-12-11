@@ -7,6 +7,7 @@ from users.serializers import UserSerializer
 class BorrowingSerializer(serializers.ModelSerializer):
     book = BookSerializer(read_only=True)
     user = UserSerializer(read_only=True)
+    is_active = serializers.SerializerMethodField()
 
     class Meta:
         model = Borrowing
@@ -17,7 +18,11 @@ class BorrowingSerializer(serializers.ModelSerializer):
             "actual_return_date",
             "book",
             "user",
+            "is_active",
         ]
+
+    def get_is_active(self, obj):
+        return obj.is_active()
 
 
 class BorrowingCreateSerializer(serializers.ModelSerializer):
