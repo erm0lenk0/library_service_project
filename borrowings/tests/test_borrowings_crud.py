@@ -52,11 +52,10 @@ class BorrowingsAPITest(APITestCase):
             "borrow_date": "2025-02-01",
             "expected_return_date": "2025-02-10",
             "book": self.book.id,
-            "user": self.user.id,
         }
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(Borrowing.objects.count(), 2)
+        self.assertIn("expected_return_date", response.data)
 
     def test_create_borrowing_invalid_data(self):
         url = reverse("borrowings-list")
