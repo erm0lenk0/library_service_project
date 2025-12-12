@@ -1,6 +1,8 @@
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, status
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiParameter
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from .filters import BorrowingFilter
 from .models import Borrowing
@@ -66,3 +68,22 @@ class BorrowingViewSet(viewsets.ModelViewSet):
         if not user.is_staff:
             qs = qs.filter(user=user)
         return qs
+
+    @extend_schema(
+        summary="Return borrowing.",
+        description=(
+            "Marks a borrowing as returned by setting `actual_return_date`.\n\n"
+            "If the borrowing is already returned, an error is returned."
+        ),
+        responses={200: BorrowingSerializer},
+        tags=["Borrowings"],
+    )
+    @action(detail=True, methods=["post"], url_path="return")
+    def return_borrowing(self, request, pk=None):
+        borrowing = self.get_object()
+        try:
+            borrowing.return_book()
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = BorrowingSerializer(borrowing)
+        return Response(serializer.data)

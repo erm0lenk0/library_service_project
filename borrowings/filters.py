@@ -4,6 +4,7 @@ from .models import Borrowing
 
 class BorrowingFilter(django_filters.FilterSet):
     is_active = django_filters.BooleanFilter(method="filter_is_active")
+    user = django_filters.NumberFilter(field_name="user__id")
 
     class Meta:
         model = Borrowing

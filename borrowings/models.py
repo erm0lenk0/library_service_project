@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from books.models import Book
+from django.utils import timezone
 
 
 class Borrowing(models.Model):
@@ -17,3 +18,9 @@ class Borrowing(models.Model):
 
     def is_active(self):
         return self.actual_return_date is None
+
+    def return_book(self):
+        if self.actual_return_date is not None:
+            raise ValueError("This borrowing has already been returned.")
+        self.actual_return_date = timezone.now().date()
+        self.save()
