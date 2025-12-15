@@ -1,8 +1,11 @@
+import logging
+
 from rest_framework import viewsets, permissions, status
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiParameter
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from notifications import send_telegram_message
 
 from .filters import BorrowingFilter
 from .models import Borrowing
@@ -81,9 +84,25 @@ class BorrowingViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["post"], url_path="return")
     def return_borrowing(self, request, pk=None):
         borrowing = self.get_object()
+        if borrowing.actual_return_date:
+            return Response(
+                {"error": "This borrowing is already returned."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        borrowing.return_book()
+
+        book_title = borrowing.book.title if borrowing.book else "Unknown"
+
         try:
-            borrowing.return_book()
-        except ValueError as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            send_telegram_message(
+                f"Book returned!\n"
+                f"User: {borrowing.user.username}\n"
+                f"Book: {book_title}\n"
+                f"Return date: {borrowing.actual_return_date}"
+            )
+        except Exception as e:
+            logging.error(f"Error sending return notification: {e}")
+
         serializer = BorrowingSerializer(borrowing)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)

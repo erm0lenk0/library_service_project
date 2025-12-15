@@ -1,7 +1,9 @@
 from rest_framework import serializers
+from notifications import send_telegram_message
 from .models import Borrowing
 from books.serializers import BookSerializer
 from users.serializers import UserSerializer
+import logging
 
 
 class BorrowingSerializer(serializers.ModelSerializer):
@@ -49,6 +51,18 @@ class BorrowingCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = self.context["request"].user
         borrowing = Borrowing.objects.create(user=user, **validated_data)
+
+        book_title = borrowing.book.title if borrowing.book else "Unknown"
+
+        try:
+            send_telegram_message(
+                f"New rental!\n"
+                f"User: {user.username}\n"
+                f"Book: {book_title}\n"
+                f"Expected Return Date: {borrowing.expected_return_date}\n"
+            )
+        except Exception as e:
+            logging.error(f"Error sending notification: {e}")
         return borrowing
 
 
@@ -56,4 +70,4 @@ class BorrowingReturnsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Borrowing
         fields = ["id", "actual_return_date"]
-        read_only_fields = ["id", "actual_return_date"]
+        read_only_fields = ["id"]
