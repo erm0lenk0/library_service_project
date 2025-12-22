@@ -5,6 +5,7 @@ source =
     library_service_project
     users
     borrowings
+    payments
 
 [report]
 show_missing = True
