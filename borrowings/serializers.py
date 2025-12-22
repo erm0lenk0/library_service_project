@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from notifications import send_telegram_message
+from payments.serializers import PaymentSerializer
 from .models import Borrowing
 from books.serializers import BookSerializer
 from users.serializers import UserSerializer
@@ -10,6 +11,7 @@ class BorrowingSerializer(serializers.ModelSerializer):
     book = BookSerializer(read_only=True)
     user = UserSerializer(read_only=True)
     is_active = serializers.SerializerMethodField()
+    payments = PaymentSerializer(many=True, read_only=True)
 
     class Meta:
         model = Borrowing
@@ -21,6 +23,7 @@ class BorrowingSerializer(serializers.ModelSerializer):
             "book",
             "user",
             "is_active",
+            "payments",
         ]
 
     def get_is_active(self, obj):
@@ -71,3 +74,9 @@ class BorrowingReturnsSerializer(serializers.ModelSerializer):
         model = Borrowing
         fields = ["id", "actual_return_date"]
         read_only_fields = ["id"]
+
+
+class BorrowingCreateResponseSerializer(serializers.Serializer):
+    borrowings = BorrowingSerializer()
+    payments = PaymentSerializer()
+    checkout_url = serializers.CharField()
