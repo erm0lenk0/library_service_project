@@ -3,10 +3,18 @@ branch = True
 source =
     books
     library_service_project
+    users
+    borrowings
+    payments
 
 [report]
 show_missing = True
 skip_covered = True
+exclude_lines =
+    pragma: no cover
+    def __str__
+    if __name__ == .__main__.:
+    raise NotImplementedError
 
 [html]
 directory = coverage_html_report

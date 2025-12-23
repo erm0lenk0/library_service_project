@@ -27,6 +27,7 @@ staticfiles/
 # PostgreSQL
 *.sql
 *.dump
+data.json
 
 # Coverage & testing
 .coverage
